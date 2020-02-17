@@ -1,5 +1,5 @@
 import CsvReaderSample from '../src/index'
-import fs, { WriteStream } from 'fs'
+import fs from 'fs'
 import path from 'path'
 
 describe('テスト', () => {
@@ -38,17 +38,30 @@ describe('テスト', () => {
     }
   })
 
-  afterEach(async () => {
-    await new Promise((resolve, reject) => {
-      fs.unlink(fullPath, error => {
-        if (error) {
-          console.log(error)
-          reject(error)
-        }
-        resolve()
-      })
-    })
+
+  it('getテスト3', async () => {
+    instances = await api.getAndExtractAndParse(url)
+    assertBasicArray(instances, 22)
+    for (const obj of instances.filter(instance => instance['郵便番号'] === '100-0000')) {
+      console.log(obj)
+    }
   })
+
+  afterEach(() => {
+    fs.unlinkSync(fullPath)
+  })
+
+  // afterEach(async () => {
+  //   await new Promise((resolve, reject) => {
+  //     fs.unlink(fullPath, error => {
+  //       if (error) {
+  //         console.log(error)
+  //         reject(error)
+  //       }
+  //       resolve()
+  //     })
+  //   })
+  // })
 })
 
 function assertBasicArray(actualInstances: any[], expectedColumnCount: number) {
