@@ -37,6 +37,20 @@ class CsvReaderSample {
       // })
     })
   }
+
+  getAndExtractAndParse = (url: string): Promise<any[]> => {
+    return new Promise((resolve, reject) => {
+      let datas: any[] = []
+      http.get(url, (res: http.IncomingMessage) => {
+        res.pipe(unzip.Parse()).on('entry', entry => {
+          entry.pipe(iconv.decodeStream('Shift_JIS'))
+            .pipe(iconv.encodeStream('utf-8'))
+            .pipe(csv().on('data', data => datas.push(JSON.parse(data))))
+            .on('end', () => resolve(datas))
+        })
+      })
+    })
+  }
 }
 
 export = CsvReaderSample
@@ -62,5 +76,15 @@ if (!module.parent) {
         }
       })
   })
+
+  reader.getAndExtractAndParse('http://jusyo.jp/downloads/new/csv/csv_13tokyo.zip')
+    .then((results: any[]) => {
+      // 郵便番号が「100-000x」のものに絞ってみた
+      results = results.filter(address => address['郵便番号'].startsWith('100-000'))
+      console.table(results)
+      for (const address of results) {
+        console.log(address)
+      }
+    })
 }
 // https://tsurutoro.com/pseudo_data/
