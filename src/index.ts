@@ -3,6 +3,7 @@ import iconv from 'iconv-lite'
 import csv from 'csvtojson'
 import unzip from 'unzip'
 import http from 'http'
+import { csv2json } from 'excel-csv-read-write'
 
 class CsvReaderSample {
   /**
@@ -44,8 +45,7 @@ export = CsvReaderSample
 if (!module.parent) {
   const reader = new CsvReaderSample()
   reader.getAndExtract('http://jusyo.jp/downloads/new/csv/csv_13tokyo.zip').then(() => {
-    reader
-      .parse('./13tokyo.csv')
+    csv2json('./13tokyo.csv')
       .then((results: any[]) => {
         // 郵便番号が「100-000x」のものに絞ってみた
         results = results.filter(address => address['郵便番号'].startsWith('100-000'))
